@@ -5,12 +5,11 @@ import torch.nn as nn
 import json
 import re
 
-APP_DIR = "/content/drive/MyDrive/TPCG_Streamlit_App"
-MODEL2_PATH = f"{APP_DIR}/model2_attention_seq2seq.pt"
-Q_STOI_PATH = f"{APP_DIR}/q_stoi.json"
-Q_ITOS_PATH = f"{APP_DIR}/q_itos.json"
-CODE_STOI_PATH = f"{APP_DIR}/code_stoi.json"
-CODE_ITOS_PATH = f"{APP_DIR}/code_itos.json"
+MODEL2_PATH = "model2_attention_seq2seq.pt"
+Q_STOI_PATH = "q_stoi.json"
+Q_ITOS_PATH = "q_itos.json"
+CODE_STOI_PATH = "code_stoi.json"
+CODE_ITOS_PATH = "code_itos.json"
 
 PAD = "<pad>"
 SOS = "<sos>"
