@@ -182,43 +182,43 @@ def generate_code_model2(model, question_text, q_stoi, code_stoi, code_itos, max
 
     tokens = tokenize_question(question_text)
     unk_id = q_stoi.get(UNK, 3)
-    sos_id_q = q_stoi.get(SOS, 1)
-    eos_id_q = q_stoi.get(EOS, 2)
 
     ids = [q_stoi.get(tok, unk_id) for tok in tokens]
-    ids = [sos_id_q] + ids[:MAX_QUESTION_LEN - 2] + [eos_id_q]
+    ids = ids[:MAX_QUESTION_LEN]
 
     src = torch.tensor(ids, dtype=torch.long).unsqueeze(0).to(DEVICE)
-generated_ids = []
+    generated_ids = []
 
-sos_id_code = code_stoi.get(SOS, 1)
-eos_id_code = code_stoi.get(EOS, 2)
+    sos_id_code = code_stoi.get(SOS, 1)
+    eos_id_code = code_stoi.get(EOS, 2)
 
-with torch.no_grad():
-    encoder_outputs, hidden, cell = model.encoder(src)
-    input_token = torch.tensor([sos_id_code], dtype=torch.long).to(DEVICE)
+    with torch.no_grad():
+        encoder_outputs, hidden, cell = model.encoder(src)
+        input_token = torch.tensor([sos_id_code], dtype=torch.long).to(DEVICE)
 
-    unk_count = 0   # ✅ INSIDE
+        unk_count = 0
 
-    for _ in range(max_len):   # ✅ INSIDE
-        output, hidden, cell = model.decoder(input_token, hidden, cell, encoder_outputs)
-        pred_token = output.argmax(1).item()
+        for _ in range(max_len):
+            output, hidden, cell = model.decoder(input_token, hidden, cell, encoder_outputs)
+            pred_token = output.argmax(1).item()
 
-        if pred_token == eos_id_code:
-            break
+            if pred_token == eos_id_code:
+                break
 
-        tok = token_from_itos(code_itos, pred_token)
+            tok = token_from_itos(code_itos, pred_token)
 
-        if tok == "<unk>":
-            unk_count += 1
-        else:
-            unk_count = 0
+            if tok == "<unk>":
+                unk_count += 1
+            else:
+                unk_count = 0
 
-        if unk_count >= 3:
-            break
+            if unk_count >= 3:
+                break
 
-        generated_ids.append(pred_token)
-        input_token = torch.tensor([pred_token], dtype=torch.long).to(DEVICE)
+            generated_ids.append(pred_token)
+            input_token = torch.tensor([pred_token], dtype=torch.long).to(DEVICE)
+
+    return decode_ids(generated_ids, code_itos)
 
 
 # ---------------------------
