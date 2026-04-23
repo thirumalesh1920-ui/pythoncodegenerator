@@ -198,9 +198,9 @@ with torch.no_grad():
     encoder_outputs, hidden, cell = model.encoder(src)
     input_token = torch.tensor([sos_id_code], dtype=torch.long).to(DEVICE)
 
-    unk_count = 0
+    unk_count = 0   # ✅ INSIDE
 
-    for _ in range(max_len):
+    for _ in range(max_len):   # ✅ INSIDE
         output, hidden, cell = model.decoder(input_token, hidden, cell, encoder_outputs)
         pred_token = output.argmax(1).item()
 
@@ -219,14 +219,6 @@ with torch.no_grad():
 
         generated_ids.append(pred_token)
         input_token = torch.tensor([pred_token], dtype=torch.long).to(DEVICE)
-
-            if pred_token == eos_id_code:
-                break
-
-            generated_ids.append(pred_token)
-            input_token = torch.tensor([pred_token], dtype=torch.long).to(DEVICE)
-
-    return decode_ids(generated_ids, code_itos)
 
 
 # ---------------------------
