@@ -17,7 +17,7 @@ EOS = "<eos>"
 UNK = "<unk>"
 
 MAX_QUESTION_LEN = 100
-MAX_CODE_LEN = 300
+MAX_CODE_LEN = 80
 DEVICE = torch.device("cpu")
 
 
@@ -132,8 +132,15 @@ def decode_ids(ids, code_itos):
     tokens = []
     for idx in ids:
         tok = token_from_itos(code_itos, idx)
-        if tok in [PAD, SOS, EOS]:
+
+        # skip useless tokens
+        if tok in ["<pad>", "<sos>", "<eos>"]:
             continue
+
+        # replace unknown tokens
+        if tok == "<unk>":
+            continue   # remove instead of showing
+
         tokens.append(tok)
 
     return " ".join(tokens)
@@ -191,9 +198,27 @@ def generate_code_model2(model, question_text, q_stoi, code_stoi, code_itos, max
         encoder_outputs, hidden, cell = model.encoder(src)
         input_token = torch.tensor([sos_id_code], dtype=torch.long).to(DEVICE)
 
-        for _ in range(max_len):
-            output, hidden, cell = model.decoder(input_token, hidden, cell, encoder_outputs)
-            pred_token = output.argmax(1).item()
+       unk_count = 0
+
+for _ in range(max_len):
+    output, hidden, cell = model.decoder(input_token, hidden, cell, encoder_outputs)
+    pred_token = output.argmax(1).item()
+
+    if pred_token == eos_id_code:
+        break
+
+    tok = token_from_itos(code_itos, pred_token)
+
+    if tok == "<unk>":
+        unk_count += 1
+    else:
+        unk_count = 0
+
+    if unk_count >= 3:
+        break
+
+    generated_ids.append(pred_token)
+    input_token = torch.tensor([pred_token], dtype=torch.long).to(DEVICE)
 
             if pred_token == eos_id_code:
                 break
