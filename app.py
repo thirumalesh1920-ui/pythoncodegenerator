@@ -17,7 +17,7 @@ EOS = "<eos>"
 UNK = "<unk>"
 
 MAX_QUESTION_LEN = 100
-MAX_CODE_LEN = 80
+MAX_CODE_LEN = 30
 DEVICE = torch.device("cpu")
 
 
