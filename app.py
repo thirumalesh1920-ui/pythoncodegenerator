@@ -267,7 +267,7 @@ st.sidebar.write("❓ Help Center")
 st.sidebar.write("⚙️ Settings")
 
 st.markdown(
-    "<h1 style='text-align: center;'>💬 ChatTPCG</h1>",
+    "<h1 style='text-align: center;'>ChatTPCG</h1>",
     unsafe_allow_html=True
 )
 st.markdown(
